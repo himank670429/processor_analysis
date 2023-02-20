@@ -24,8 +24,8 @@ def get_cpu_data(url, missing_info : list):
 
     divs = list(spec_soup.select('.tech-section-row'))
     divs_len = len(divs)
+    data['generation'][f'{row_count}'] = divs[0].select_one('.tech-data').get_text().strip().split('th')[0]
     current_div_index = 0
-    data['generation'][f'{row_count}'] = divs[0].select_one('.tech-data a').get_text().split('th')[0]
     while len(missing_info) != 0 and current_div_index < divs_len:
         # get the values if they match
         current_div = divs[current_div_index]
@@ -102,5 +102,5 @@ def main():
 if __name__ == "__main__":
     main()
     # out the data to a file
-    with open('output/cpu.json', 'w') as file:
+    with open('cpu.json', 'w') as file:
         json.dump(data, file, indent=4)
