@@ -6,13 +6,13 @@ import json
 data = {
     "number" : {},
     "generation" : {},
+    "launch_date" : {},
     "series" : {},
     "status" : {},
     "core_count" : {},
     "max_freq" : {},
     "base_freq" : {},
     "cache" : {},
-    "architecture" : {},
     "TDP" : {}
 }
 row_count = 0
@@ -76,8 +76,9 @@ def main():
         for tr in rows:
             row_data = tr.findChildren('td')
             link = row_data[0].find_next('a').attrs['href']
-            status, _, no_of_cores, max_freq, base_freq, cache, TDP = row_data[1:8]
+            status, date, no_of_cores, max_freq, base_freq, cache, TDP = row_data[1:8]
             data['status'][f'{row_count}'] = status.get_text().strip()
+            data['launch_date'][f'{row_count}'] = date.get_text().strip()
             data['core_count'][f'{row_count}'] = no_of_cores.get_text().strip()
             data['max_freq'][f'{row_count}'] = max_freq.get_text().strip()
             data['base_freq'][f'{row_count}'] = base_freq.get_text().strip()
@@ -86,7 +87,7 @@ def main():
             data['series'][f'{row_count}'] = f'i{url[-15]}'
             
             # figure out what data is missing
-            missing_info = ['number', 'architecture']
+            missing_info = ['number']
             if not max_freq.get_text().strip(): missing_info.append('max_freq')
             if not base_freq.get_text().strip(): missing_info.append('base_freq')
             if not TDP.get_text().strip(): missing_info.append('TDP')
