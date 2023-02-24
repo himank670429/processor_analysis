@@ -2,66 +2,111 @@ from dash import html, dcc, Dash, Input, Output, callback
 import pandas as pd
 import plotly.express as px
 
-df = pd.read_parquet('cpu.parquet')
+df = pd.read_parquet('data/cpu.parquet')
 
 # sub dataframes
-launch_date_df = pd.read_parquet('launch_date.parquet')
+launch_date_df = pd.read_parquet('data/launch_date.parquet')
 
-core_count_df = pd.read_parquet('core_count_df.parquet')
+core_count_df = pd.read_parquet('data/core_count_df.parquet')
 
-TDP_df = pd.read_parquet('TDP_df.parquet')
+TDP_df = pd.read_parquet('data/TDP_df.parquet')
 
 # app
 app = Dash(__name__)
-
 app.layout = html.Div(id = 'container', children = [
-    html.H1("CPU analysis"),
-    # drop down
-    dcc.Dropdown(id = 'series', options=[
-        {'label' : 'Intel core i3', 'value' : 'i3'},
-        {'label' : 'Intel core i5', 'value' : 'i5'},
-        {'label' : 'Intel core i7', 'value' : 'i7'},
-        {'label' : 'Intel core i9', 'value' : 'i9'}
-    ], value = 'i3', multi = False, style = {'width':'70%'}),
-
-    # pie charts 
-    html.Div(id = 'pie-charts', style = {'display':'flex'}, children = [
-        # status pie chart
-        dcc.Graph(id = 'pie-status-chart', style = {'width':'50%'}),
-
-        # smart cache chart
-        dcc.Graph(id = 'pie-smart-cache-chart', style = {'width':'50%'})
+    # app header
+    html.Header([
+        html.Link(rel='stylesheet', href='assets/style.css'),
+        html.Script(src = "https://kit.fontawesome.com/a90318e7e1.js", crossOrigin = 'anonymous')
     ]),
 
-    # bar charts
-    html.Div(id = 'bar charts', children = [
-        dcc.Graph(id = 'bar-cpu-launch', style = {'width' : '50%'})
+    # app main content
+    html.Main(id = 'main', children = [
+        # heading 
+        html.Div(id = 'header', children = [
+            html.Img(src='assets/logo.png'),
+            html.H1('CPU Analysis')
+        ]),
+        # line charts
+        html.Div(id = 'line-charts-sep', style = {'display':'flex'}, children = [
+            # generation v/s core count chart
+            dcc.Graph(
+                id = 'line-gen-core-count',
+                style = {'width' : '50%'},
+                figure = px.line(
+                    core_count_df ,
+                    x = 'generation',
+                    y = ['min core count','max core count','avg core count'],
+                    markers = True,
+                    color_discrete_sequence = ['#B3B3B4', '#5D5D5D','#446CF1'], 
+                    title='generation v/s core count'
+                ), 
+            ),
+
+            # generation v/s TDP chart
+            dcc.Graph(
+                id = 'line-gen-TDP',
+                style = {'width' : '50%'},
+                figure = px.line(
+                    TDP_df,
+                    x = 'generation',
+                    y = ['min TDP','max TDP', 'avg TDP'],
+                    markers = True, 
+                    color_discrete_sequence = ['#B3B3B4', '#5D5D5D','#446CF1'], 
+                    title='generation v/s TDP'
+                ), 
+            ),    
+        ]),
+
+        # break
+        html.Hr(),
+        html.H3('select the series of CPU'),
+
+        # drop down
+        dcc.Dropdown(id = 'series', options=[
+            {'label' : 'Intel core i3', 'value' : 'i3'},
+            {'label' : 'Intel core i5', 'value' : 'i5'},
+            {'label' : 'Intel core i7', 'value' : 'i7'},
+            {'label' : 'Intel core i9', 'value' : 'i9'}
+        ], value = 'i3', multi = False, style = {'width':'70%'}),
+
+        # pie charts 
+        html.Div(id = 'pie-charts', style = {'display':'flex'}, children = [
+            # status pie chart
+            dcc.Graph(id = 'pie-status-chart', style = {'width':'50%'}),
+
+            # smart cache chart
+            dcc.Graph(id = 'pie-smart-cache-chart', style = {'width':'50%'})
+        ]),
+
+        # line chart
+        html.Div(id = 'line-charts-drop', children = [
+            dcc.Graph(id = 'line-cpu-launch', style = {'width' : '50%'})
+        ])
     ]),
 
-    # line chart
-    html.Div(id = 'line charts', style = {'display':'flex'}, children = [
-        # generation v/s core count chart
-        dcc.Graph(
-            id = 'line-gen-core_count',
-            style = {'width' : '50%'},
-            figure = px.line(core_count_df ,x = 'generation', y = ['min core count','max core count'], markers = True, color_discrete_sequence = ['LightSkyBlue','SlateGray'], title='generation and core count'), 
-        ),
+    # app footer
+    html.Div(id = 'footer', children = [
+        html.Span('Copyright © 2023 CPU Analysis Dashboard'),
+        html.Span('follow me on'),
 
-        # generation v/s TDP chart
-        dcc.Graph(
-            id = 'line-gen-TDP',
-            style = {'width' : '50%'},
-            figure = px.line(TDP_df ,x = 'generation', y = ['min TDP','max TDP'], markers = True, color_discrete_sequence = ['LightSkyBlue','SlateGray'], title='generation and TDP'), 
-        ),    
-    ])
+        html.Span([html.Img(src = 'assets/github.svg'), html.A('github', href = 'https://github.com/himank670429')]),
 
+        html.Span([html.Img(src = 'assets/linkedin.svg'), html.A('linkedin', href = 'https://www.linkedin.com/in/himank-singh-65b411249/')]),
+
+        html.Span([html.Img(src = 'assets/instagram.svg'), html.A('intagram', href = 'https://www.instagram.com/himank_singh9/')]),
+
+        html.Span('Data Source  '),
+
+        html.Span([html.Img(src = 'assets/intel.svg'), html.A('intel offcial website', href = 'https://www.intel.in/content/www/in/en/homepage.html')])
+    ]),
 ])
 
 @callback(
     [
         Output(component_id = 'pie-status-chart', component_property = 'figure'),
         Output(component_id = 'pie-smart-cache-chart', component_property = 'figure'),
-        Output(component_id = 'bar-cpu-launch', component_property = 'figure'),
+        Output(component_id = 'line-cpu-launch', component_property = 'figure'),
     ],
     [
         Input(component_id = 'series', component_property = 'value'),
@@ -72,12 +117,31 @@ def update(cpu_series):
     df_series = df.loc[df['series'] == cpu_series]
     return (
         # pie charts 
-        px.pie(df_series, names = 'status', hole = 0.5, title = 'status of CPUs', color_discrete_sequence=['LightSkyBlue', 'SlateGray', 'MidnightBlue']),
+        px.pie(
+            df_series,
+            names = 'status', 
+            hole = 0.5, 
+            title = 'status of CPUs', 
+            color_discrete_sequence=['#00FFFF', '#017AFF', '#191970']
+        ),
 
-        px.pie(df_series, names='smart cache', hole = 0.5, title = 'smart cache ratio', color_discrete_sequence=['CornflowerBlue', 'LightGreen']),
+        px.pie(
+            df_series, 
+            names='smart cache', 
+            hole = 0.5, 
+            title = 'smart cache ratio', 
+            color_discrete_sequence=['#3261B4', '#ADB7BA']
+        ),
 
-        # bar chart
-        px.bar(launch_date_df, x = 'year', y = cpu_series, title = 'CPU lauch data')
+        # line chart
+        px.line(
+            launch_date_df, 
+            x = 'year', 
+            y = [cpu_series], 
+            title = 'CPU lauch data', 
+            markers = True,
+            color_discrete_sequence=['#848BDD']
+        )
     )
 # run the dash app
 if __name__ == "__main__":

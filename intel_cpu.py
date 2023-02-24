@@ -1,6 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import json
+import pandas as pd
 
 # global data
 data = {
@@ -102,6 +102,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # out the data to a file
-    with open('cpu.json', 'w') as file:
-        json.dump(data, file, indent=4)
+    # output the data to a parquet file
+    df = pd.DataFrame(data)
+    df.to_parquet('cpu.parquet')
