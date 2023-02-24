@@ -23,6 +23,7 @@ Data filtering was done using python's `pandas` library.
 Data Visualisation was done using python's `dash` and `plotly` library.
 
 `analysis.py` file consists of the source code for all the visualisation done so far.
+
 ---
 
 Final Report generated from the analysis can be found in this repository by the name `CPU analysis.md`
