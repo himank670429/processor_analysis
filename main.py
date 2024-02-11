@@ -1,6 +1,9 @@
 from dash import html, dcc, Dash, Input, Output, callback
 import pandas as pd
 import plotly.express as px
+from dotenv import load_dotenv
+load_dotenv()
+from os import environ
 
 df = pd.read_parquet('data/cpu.parquet')
 
@@ -163,4 +166,4 @@ def update(cpu_series):
 
 # run the dash app
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(debug = (environ.get('DEBUG')=='True'))
