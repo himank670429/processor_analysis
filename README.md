@@ -22,7 +22,7 @@ Data filtering was done using python's `pandas` library.
 ## Data Visualisation
 Data Visualisation was done using python's `dash` and `plotly` library.
 
-`analysis.py` file consists of the source code for all the visualisation done so far.
+`main.py` file consists of the source code for all the visualisation done so far.
 
 ---
 
